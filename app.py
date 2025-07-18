@@ -1,10 +1,11 @@
-# app.py (Versão com botões na Sidebar)
+# app.py (Versão Corrigida com st.button e Session State)
 
 import streamlit as st
 import pandas as pd
 import numpy as np
 import folium
 from streamlit_folium import st_folium
+# A biblioteca streamlit_pills não é mais necessária
 
 # --- 1. CONFIGURAÇÃO DA PÁGINA E CARREGAMENTO DO CSS ---
 st.set_page_config(
@@ -13,10 +14,12 @@ st.set_page_config(
     layout="wide"
 )
 
+# Função para carregar o arquivo CSS externo
 def carregar_css(caminho_arquivo):
     with open(caminho_arquivo) as f:
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
+# Carrega os estilos do arquivo style.css
 carregar_css("style.css")
 
 
@@ -24,6 +27,7 @@ carregar_css("style.css")
 class API_Financeira:
     @st.cache_data
     def carregar_dados_fraude(_self):
+        # ... (seu código da API aqui, sem alterações)
         loc_coords = {
             'São Paulo': (-23.55, -46.63), 'Rio de Janeiro': (-22.90, -43.17),
             'Belo Horizonte': (-19.92, -43.93), 'Salvador': (-12.97, -38.50),
@@ -43,6 +47,7 @@ class API_Financeira:
         return df
 
     def criar_mapa_folium_agregado(_self, df: pd.DataFrame):
+        # ... (seu código do mapa aqui, sem alterações)
         if df.empty: return None
         df_agregado = df.groupby('Location').agg(
             Latitude=('Latitude', 'mean'), Longitude=('Longitude', 'mean'),
@@ -63,35 +68,36 @@ class API_Financeira:
 api = API_Financeira()
 
 
-# --- 3. NAVEGAÇÃO COM BOTÕES E CONTROLE DE ESTADO (MODIFICADO) ---
-
-# Título principal na página
+# --- 3. NAVEGAÇÃO COM BOTÕES E CONTROLE DE ESTADO ---
 st.markdown("<div class='dashboard-title'><h1>Análise de Crédito e Risco Financeiro</h1></div>", unsafe_allow_html=True)
-st.markdown("---")
 
-# PASSO CHAVE 1: Inicializa o estado da sessão (sem alterações)
+# PASSO CHAVE 1: Inicializa o estado da sessão na primeira execução
 if 'pagina_ativa' not in st.session_state:
     st.session_state.pagina_ativa = 'Visão Geral'
 
-# PASSO CHAVE 2: Cria os botões de navegação DENTRO DA SIDEBAR
-st.sidebar.title("Menu de Navegação")
-st.sidebar.write("Selecione a análise desejada:")
+# PASSO CHAVE 2: Cria os botões em colunas para ficarem lado a lado
+st.write("#### Selecione a análise:")
+col1, col2, _ = st.columns([1.5, 2.2, 5]) # Ajuste as proporções se precisar
 
-# O botão é do tipo "primary" (destacado) SE a página ativa for "Visão Geral"
-if st.sidebar.button('💡 Visão Geral', use_container_width=True, 
-                      type="primary" if st.session_state.pagina_ativa == 'Visão Geral' else "secondary"):
-    st.session_state.pagina_ativa = 'Visão Geral'
-    st.rerun() 
+with col1:
+    # O botão é do tipo "primary" (destacado) SE a página ativa for "Visão Geral"
+    if st.button('💡 Visão Geral', use_container_width=True, 
+                 type="primary" if st.session_state.pagina_ativa == 'Visão Geral' else "secondary"):
+        st.session_state.pagina_ativa = 'Visão Geral'
+        st.rerun() # Opcional, mas garante uma re-execução limpa
 
-# O botão é do tipo "primary" SE a página ativa for "Análise Geográfica"
-if st.sidebar.button('🗺️ Análise Geográfica', use_container_width=True,
-                      type="primary" if st.session_state.pagina_ativa == 'Análise Geográfica' else "secondary"):
-    st.session_state.pagina_ativa = 'Análise Geográfica'
-    st.rerun()
+with col2:
+    # O botão é do tipo "primary" SE a página ativa for "Análise Geográfica"
+    if st.button('🗺️ Análise Geográfica Interativa', use_container_width=True,
+                 type="primary" if st.session_state.pagina_ativa == 'Análise Geográfica' else "secondary"):
+        st.session_state.pagina_ativa = 'Análise Geográfica'
+        st.rerun() # Opcional, mas garante uma re-execução limpa
+
+st.markdown("---")
 
 
-# --- 4. RENDERIZAÇÃO DAS PÁGINAS (sem alterações) ---
-# O conteúdo exibido depende do que está salvo na "memória" (session_state)
+# --- 4. RENDERIZAÇÃO DAS PÁGINAS ---
+# PASSO CHAVE 3: O conteúdo exibido depende do que está salvo na "memória" (session_state)
 
 if st.session_state.pagina_ativa == "Visão Geral":
     st.markdown("<div class='section-header'><h1>💡 Visão Geral da Análise de Fraude</h1></div>", unsafe_allow_html=True)
