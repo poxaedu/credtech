@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+lib/
+include/
+bin/
+share/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Dados brutos e processados que não devem ser versionados
+*.csv
+*.parquet
+*.log
+!data/ # Não ignore a pasta 'data' (ou 'raw_data' como na sua imagem)
+!raw_data/ # Adicionado para corresponder à sua imagem
+
+# Pastas de dados que devem conter apenas arquivos gerados
+gold/
+silver/
+
+# Ignorar o diretório .vscode do VS Code (se existir e não quiser compartilhar configurações locais)
+.vscode/
+
+# Ignorar arquivos de teste ou notebooks temporários
+.ipynb_checkpoints/
