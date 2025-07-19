@@ -1,11 +1,16 @@
-import pandas as pd
-import os
 import logging
-import numpy as np # Para np.log1p se for usado em novas métricas logaritmizadas
+import os
 from datetime import date, timedelta
 
+import numpy as np  # Para np.log1p se for usado em novas métricas logaritmizadas
+import pandas as pd
+
+# from dateutil.relativedelta import relativedelta # Descomente se preferir usar relativedelta para datas
+
+
 # --- Configuração de Logging ---
-log_file_path = 'etl_gold_pipeline.log' # Novo arquivo de log para Gold
+# Define o caminho para o arquivo de log, colocando-o na raiz do projeto
+log_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'etl_gold_pipeline.log')
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -16,18 +21,30 @@ logging.basicConfig(
 )
 logging.info("Script ETL: Silver to Gold (SCR.data) - Iniciado em ambiente LOCAL.")
 
-# --- Configurações Locais de Pastas ---
-# Caminho base do projeto (onde este script está sendo executado)
-# Usamos __file__ para garantir que o BASE_DIR seja o diretório do script, independente de onde é chamado
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# --- Configurações Locais de Pastas (Corrigido para a estrutura do seu projeto) ---
+# Define o diretório base como o diretório PAI do diretório do script.
+# Se o script está em /MeuProjeto/scripts/, BASE_DIR será /MeuProjeto/.
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Caminhos das camadas no sistema de arquivos local
-SILVER_SCR_INPUT_PATH = os.path.join(BASE_DIR, 'silver', 'scr')
-GOLD_SCR_OUTPUT_PATH = os.path.join(BASE_DIR, 'gold', 'scr-agregado')
+# SILVER_SCR_INPUT_PATH será: seu_projeto_raiz/data/silver/scr
+SILVER_SCR_INPUT_PATH = os.path.join(BASE_DIR, 'data', 'silver', 'scr')
+
+# GOLD_SCR_OUTPUT_PATH será: seu_projeto_raiz/data/gold/scr-tratado
+GOLD_SCR_OUTPUT_PATH = os.path.join(BASE_DIR, 'data', 'gold', 'scr-tratado') # Use 'scr-tratado' conforme sua imagem
 
 # Criar os diretórios Gold se não existirem
 os.makedirs(GOLD_SCR_OUTPUT_PATH, exist_ok=True)
 logging.info(f"Pasta Gold (destino) verificada/criada em: {GOLD_SCR_OUTPUT_PATH}")
+
+# --- Adicionado para Depuração (Remova após confirmar que está funcionando) ---
+logging.info(f"DEBUG: Caminho absoluto do script: {os.path.abspath(__file__)}")
+logging.info(f"DEBUG: Diretório do script: {os.path.dirname(os.path.abspath(__file__))}")
+logging.info(f"DEBUG: BASE_DIR (raiz do projeto): {BASE_DIR}")
+logging.info(f"DEBUG: Caminho completo para SILVER (Origem): {SILVER_SCR_INPUT_PATH}")
+logging.info(f"DEBUG: Caminho completo para GOLD (Destino): {GOLD_SCR_OUTPUT_PATH}")
+logging.info("-" * 50)
 
 
 # --- Definições de Colunas para Agregação ---
@@ -55,7 +72,14 @@ def processar_silver_to_gold(caminho_arquivo_silver_local: str, caminho_arquivo_
     filename_silver = os.path.basename(caminho_arquivo_silver_local)
     logging.info(f"Iniciando Silver -> Gold para: {filename_silver}")
     try:
+        # Verifica se o arquivo Silver de origem existe antes de tentar carregar
+        if not os.path.exists(caminho_arquivo_silver_local):
+            logging.warning(f"AVISO: Arquivo Silver não encontrado em '{caminho_arquivo_silver_local}'. Pulando este arquivo/mês.")
+            return None # Retorna None e não tenta processar
+
         df = pd.read_parquet(caminho_arquivo_silver_local)
+        logging.info(f"Arquivo '{filename_silver}' carregado. Linhas: {len(df)}")
+
 
         # Garante que data_base é apenas a data para agrupamento (para consistência após leitura de Parquet)
         df['data_base'] = pd.to_datetime(df['data_base']).dt.normalize()
@@ -72,6 +96,7 @@ def processar_silver_to_gold(caminho_arquivo_silver_local: str, caminho_arquivo_
             contagem_clientes_unicos_segmento=('cliente', 'nunique'), # Nova métrica
             contagem_subsegmentos=('data_base', 'count') # Contagem de linhas/registros no agrupamento
         ).reset_index()
+        logging.info(f"Agregação concluída. Linhas agregadas: {len(df_segmentos_agregados)}")
 
         # --- Recálculo de KPIs Finais no nível Agregado (mais robusto) ---
         # Taxa de Inadimplência
@@ -90,12 +115,13 @@ def processar_silver_to_gold(caminho_arquivo_silver_local: str, caminho_arquivo_
         # Limita o percentual a um máximo de 1.0 (100%) e a um mínimo de 0
         df_segmentos_agregados['perc_ativo_problematico_final_segmento'] = df_segmentos_agregados['perc_ativo_problematico_final_segmento'].clip(lower=0.0, upper=1.0)
 
-
+        # Salva o DataFrame agregado
         df_segmentos_agregados.to_parquet(caminho_arquivo_gold_local, index=False) # Salva em Gold local
         logging.info(f"Arquivo agregado salvo em Gold: {os.path.basename(caminho_arquivo_gold_local)}")
         return df_segmentos_agregados
     except FileNotFoundError:
-        logging.warning(f"Arquivo Silver não encontrado: {filename_silver}. Pulando este mês.")
+        # Este bloco agora é mais para fallback, a verificação está acima
+        logging.warning(f"Arquivo Silver não encontrado (no bloco try/except): {filename_silver}. Pulando este mês.")
         return None
     except Exception as e:
         logging.error(f"Erro ao processar Silver -> Gold para {filename_silver}: {e}", exc_info=True)
@@ -108,7 +134,7 @@ if __name__ == '__main__':
     # Definindo o período de processamento (DEVE SER O MESMO DO BRONZE->SILVER)
     # Ajuste estas datas para corresponder aos seus arquivos reais
     start_date_process = date(2024, 1, 1) # Mude para 2024, 1, 1 se seus dados começam em 202401
-    end_date_process = date(2025, 4, 1) # Ajuste a data final conforme seus arquivos
+    end_date_process = date(2025, 4, 1) # Ajuste a data final conforme seus arquivos (considerando 18 de julho de 2025, esta data final é plausível)
 
     current_date_loop = start_date_process
 
@@ -124,24 +150,23 @@ if __name__ == '__main__':
 
         # Nome do arquivo de saída na Gold
         gold_file_name_output = f"aggr_segmentos_{year}{month_str}.parquet"
-        
+
         # O caminho de destino na Gold deve incluir o ano para organização
         gold_output_year_dir = os.path.join(GOLD_SCR_OUTPUT_PATH, str(year))
         os.makedirs(gold_output_year_dir, exist_ok=True) # Garante que a pasta Gold/ano exista
 
         gold_file_path = os.path.join(gold_output_year_dir, gold_file_name_output)
 
+        logging.info(f"Tentando processar dados para {year}-{month_str}: {silver_file_path}")
+
         # Processa o arquivo
         processar_silver_to_gold(silver_file_path, gold_file_path)
 
         # Avança para o próximo mês
-        # Usamos relativedelta para lidar com a virada do ano de forma mais robusta,
-        # mas para meses simples, o seu if/else já funciona.
-        # current_date_loop += pd.offsets.DateOffset(months=1).date() # Necessitaria pandas.offsets, mas date() funciona
         if month == 12:
             current_date_loop = date(year + 1, 1, 1)
         else:
             current_date_loop = date(year, month + 1, 1)
-            
+
     logging.info("--- Processamento SCR.data (Silver -> Gold) CONCLUÍDO ---")
     logging.info("--- Script ETL: Silver to Gold (SCR.data) - FINALIZADO. ---")

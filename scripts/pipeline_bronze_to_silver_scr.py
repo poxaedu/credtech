@@ -1,12 +1,13 @@
-import pandas as pd
-import os
 import logging
+import os
 from datetime import date, timedelta
+
 import numpy as np
+import pandas as pd
 
 # --- Configuração de Logging ---
 # Configura o logging para exibir no console e salvar em um arquivo
-log_file_path = 'etl_pipeline.log' # Nome do arquivo de log
+log_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'etl_pipeline.log') # Coloca o log na raiz do projeto
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -17,17 +18,28 @@ logging.basicConfig(
 )
 logging.info("Script ETL: Bronze to Silver (SCR.data) - Iniciado.")
 
-# --- Configurações de Caminho Locais ---
-# Obtém o diretório base do script para construir caminhos relativos
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# --- Definição do Diretório Base (Correção Principal Aqui) ---
+# Define o diretório base como o diretório PAI do diretório do script.
+# Se o script está em /MeuProjeto/scripts/, BASE_DIR será /MeuProjeto/.
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Caminhos para as pastas de dados locais
+# --- Configurações de Caminho Locais ---
+# Caminhos para as pastas de dados locais, agora relativos ao BASE_DIR (raiz do projeto)
 BRONZE_SCR_LOCAL_PATH = os.path.join(BASE_DIR, 'raw_data', 'scr')
-SILVER_SCR_LOCAL_PATH = os.path.join(BASE_DIR, 'silver', 'scr')
+SILVER_SCR_LOCAL_PATH = os.path.join(BASE_DIR, 'data', 'silver', 'scr') # Cuidado: 'silver' está dentro de 'data'
 
 # Garante que a pasta Silver exista
 os.makedirs(SILVER_SCR_LOCAL_PATH, exist_ok=True)
 logging.info(f"Pasta Silver (destino) verificada/criada em: {SILVER_SCR_LOCAL_PATH}")
+
+# --- Adicionado para Depuração (Remova após confirmar que está funcionando) ---
+logging.info(f"DEBUG: Caminho absoluto do script: {os.path.abspath(__file__)}")
+logging.info(f"DEBUG: Diretório do script: {os.path.dirname(os.path.abspath(__file__))}")
+logging.info(f"DEBUG: BASE_DIR (raiz do projeto): {BASE_DIR}")
+logging.info(f"DEBUG: Caminho completo para BRONZE (Origem): {BRONZE_SCR_LOCAL_PATH}")
+logging.info(f"DEBUG: Caminho completo para SILVER (Destino): {SILVER_SCR_LOCAL_PATH}")
+logging.info("-" * 50)
+
 
 # --- Definições de Colunas e Tipos para SCR.data (Mantenha as suas) ---
 COLUNAS_SCR_ESSENCIAIS = [
@@ -108,7 +120,7 @@ def processar_bronze_to_silver_local(caminho_arquivo_bruto_local: str, caminho_a
         elif output_format == 'csv':
             # Se for CSV, garantir que o nome do arquivo termine em .csv
             if not caminho_arquivo_silver_local.endswith('.csv'):
-                caminho_arquivo_silver_local = caminho_arquivo_silver_local.replace('.parquet', '.csv')
+                caminho_arquivo_silver_local = caminho_arquivo_silver_local.replace('.parquet', '.csv') # Ajusta se for convertido de .parquet para .csv
             df.to_csv(caminho_arquivo_silver_local, index=False, sep=';', decimal=',') # Use ; e , para CSV de volta
             logging.info(f"Arquivo tratado salvo em Silver (CSV): {os.path.basename(caminho_arquivo_silver_local)}")
         else:
@@ -129,9 +141,12 @@ if __name__ == '__main__':
 
     # Listar todos os arquivos na pasta raw_data/scr
     csv_files = [f for f in os.listdir(BRONZE_SCR_LOCAL_PATH) if f.startswith('planilha_') and f.endswith('.csv')]
-    
+
     if not csv_files:
         logging.warning(f"Nenhum arquivo CSV encontrado na pasta: {BRONZE_SCR_LOCAL_PATH}")
+        # Adicione uma verificação de existência da pasta aqui também
+        if not os.path.exists(BRONZE_SCR_LOCAL_PATH):
+            logging.error(f"A pasta de origem BRONZE_SCR_LOCAL_PATH não existe: {BRONZE_SCR_LOCAL_PATH}. Verifique sua estrutura de diretórios.")
     else:
         logging.info(f"Encontrados {len(csv_files)} arquivos CSV para processar na pasta Bronze.")
 
@@ -139,13 +154,13 @@ if __name__ == '__main__':
             logging.info(f"Processando arquivo: {filename_base}")
 
             bronze_file_path = os.path.join(BRONZE_SCR_LOCAL_PATH, filename_base)
-            
+
             # Define o nome do arquivo de saída na Silver com base no formato escolhido
             if OUTPUT_FORMAT == 'parquet':
                 silver_file_name_treated = f"treated_{filename_base.replace('.csv', '.parquet')}"
             else: # CSV
                 silver_file_name_treated = f"treated_{filename_base}" # Já é .csv
-            
+
             silver_file_path = os.path.join(SILVER_SCR_LOCAL_PATH, silver_file_name_treated)
 
             processar_bronze_to_silver_local(bronze_file_path, silver_file_path, output_format=OUTPUT_FORMAT)

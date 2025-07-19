@@ -1,7 +1,8 @@
+import os
+from datetime import datetime
+
 import pandas as pd
 from bcb import sgs
-from datetime import datetime
-import os
 from tqdm import tqdm
 
 # --- 1. CONFIGURAÇÃO ---
@@ -17,7 +18,7 @@ codigos_sgs = {
 }
 
 # Pasta onde os arquivos individuais serão salvos
-OUTPUT_DIR = "raw_data/outros"
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), '..', 'raw_data', 'outros')
 
 # Período de extração (últimos 10 anos a partir da data atual)
 data_final = datetime.now()
@@ -28,6 +29,7 @@ data_inicial = data_final - pd.DateOffset(years=2)
 if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
     print(f"Diretório '{OUTPUT_DIR}' criado com sucesso.")
+else:OUTPUT_DIR = os.path.join(os.path.dirname(__file__), '..', 'raw_data', 'outros')
 
 # --- 3. LOOP DE EXTRAÇÃO INDIVIDUAL ---
 print(f"Baixando séries de {data_inicial.strftime('%d/%m/%Y')} a {data_final.strftime('%d/%m/%Y')}...")
