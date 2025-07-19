@@ -4,37 +4,40 @@
 
 Este projeto implementa uma pipeline ETL (Extract, Transform, Load) para processar dados financeiros e econômicos, movendo-os por diferentes camadas (Bronze, Silver, Gold) e, finalmente, carregando-os em um banco de dados PostgreSQL. Ele foi desenhado para lidar com dados de Carteira de Crédito (`SCR.data`) e Indicadores Econômicos externos.
 
+---
+
 ## Estrutura de Diretórios
 
-A organização do projeto segue uma estrutura clara para gerenciar dados, scripts e ambientes.
+A organização do projeto segue uma estrutura clara para gerenciar dados, scripts e ambientes:
 
+```
 .
-├── components/ # Módulos ou funções reutilizáveis (se houver)
-├── data/ # Armazena os dados processados em diferentes camadas
-│ ├── gold/ # Dados finalizados, agregados e prontos para consumo
-│ │ ├── outros-tratado/ # Indicadores econômicos consolidados (ex: indicadores_consolidados.csv)
-│ │ └── scr-tratado/ # Dados SCR agregados por mês (ex: aggr_segmentos_YYYYMM.parquet)
-│ ├── silver/ # Dados limpos e padronizados
-│ │ ├── outros/ # Indicadores econômicos individuais limpos (ex: silver_selic.csv)
-│ │ └── scr/ # Dados SCR limpos (ex: treated_planilha_YYYYMM.parquet)
-│ └── temp/ # Pasta temporária para arquivos intermediários (opcional, pode ser adicionada)
-├── raw_data/ # Dados brutos, como foram extraídos da fonte
-│ ├── outros/ # CSVs brutos de indicadores econômicos (ex: sgs_432_taxa_selic_meta.csv)
-│ └── scr/ # CSVs brutos da Carteira de Crédito (ex: planilha_YYYYMM.csv)
-├── scripts/ # Contém todos os scripts Python da pipeline ETL
-│ ├── etl_pipeline.log
-│ ├── etl_pipeline_outros.log
-│ ├── etl_gold_pipeline.log
-│ ├── etl_gold_outros_consolidado.log
-│ ├── load_gold_aggr_to_db.log
-│ ├── etl_indicadores_gold_to_db.log
-│ ├── pipeline_bronze_to_silver_sgs.py
-│ ├── pipeline_bronze_to_silver_outros.py
-│ ├── pipeline_silver_to_gold_sgs.py
-│ ├── pipeline_silver_to_gold_outros.py
-│ ├── python_load_gold_aggr_to_db.py
-│ ├── python_load_gold_outros_to_db.py
-│ └── sgl_data_installer.py
+├── components/                     # Módulos ou funções reutilizáveis (se houver)
+├── data/                          # Armazena os dados processados em diferentes camadas
+│   ├── gold/                      # Dados finalizados, agregados e prontos para consumo
+│   │   ├── outros-tratado/        # Indicadores econômicos consolidados
+│   │   └── scr-tratado/           # Dados SCR agregados por mês
+│   ├── silver/                    # Dados limpos e padronizados
+│   │   ├── outros/                # Indicadores econômicos individuais limpos
+│   │   └── scr/                   # Dados SCR limpos
+│   └── temp/                      # Arquivos intermediários (opcional)
+├── raw_data/                      # Dados brutos extraídos da fonte
+│   ├── outros/                    # Indicadores econômicos brutos
+│   └── scr/                       # Dados brutos da Carteira de Crédito
+├── scripts/                       # Scripts Python da pipeline ETL
+│   ├── etl_pipeline.log
+│   ├── etl_pipeline_outros.log
+│   ├── etl_gold_pipeline.log
+│   ├── etl_gold_outros_consolidado.log
+│   ├── load_gold_aggr_to_db.log
+│   ├── etl_indicadores_gold_to_db.log
+│   ├── pipeline_bronze_to_silver_sgs.py
+│   ├── pipeline_bronze_to_silver_outros.py
+│   ├── pipeline_silver_to_gold_sgs.py
+│   ├── pipeline_silver_to_gold_outros.py
+│   ├── python_load_gold_aggr_to_db.py
+│   ├── python_load_gold_outros_to_db.py
+│   └── sgl_data_installer.py
 ├── .gitignore
 ├── app.py
 ├── Home.py
@@ -42,127 +45,171 @@ A organização do projeto segue uma estrutura clara para gerenciar dados, scrip
 ├── README.md
 ├── requirements.txt
 └── venv/
+```
+
+---
 
 ## Pré-requisitos
 
 Antes de iniciar a instalação, certifique-se de ter os seguintes softwares instalados em seu sistema:
 
-- **Python 3.8+**: [python.org](https://www.python.org/downloads/)
-- **Git**: [git-scm.com](https://git-scm.com/downloads)
-- **PostgreSQL**: [postgresql.org](https://www.postgresql.org/download/)
+- **Python 3.8+**: [https://www.python.org/downloads/](https://www.python.org/downloads/)
+- **Git**: [https://git-scm.com/downloads](https://git-scm.com/downloads)
+- **PostgreSQL**: [https://www.postgresql.org/download/](https://www.postgresql.org/download/)
 
 > Durante a instalação do PostgreSQL:
 >
-> - Defina uma senha para o usuário `postgres`
-> - Crie o banco de dados `credtech` e o usuário `jjguilherme` com permissões adequadas (ou ajuste as credenciais nos scripts).
+> - Defina uma senha para o usuário `postgres`.
+> - Crie o banco de dados `credtech` e o usuário `jjguilherme` com permissões adequadas.
+> - Ou ajuste as credenciais diretamente nos scripts Python conforme necessário.
 
-**Exemplo de comandos SQL:**
+### Exemplo de comandos SQL
 
 ```sql
 -- Conecte-se como usuário postgres: psql -U postgres
 CREATE DATABASE credtech;
-CREATE USER jjguilherme WITH PASSWORD 'admin'; -- ou outra senha
+CREATE USER jjguilherme WITH PASSWORD 'admin';  -- ou outra senha
 GRANT ALL PRIVILEGES ON DATABASE credtech TO jjguilherme;
+```
 
-**1. Clonar o Repositório**
+---
+
+## Instalação
+
+### 1. Clonar o Repositório
+
+```bash
 git clone <URL_DO_SEU_REPOSITORIO>
 cd <nome_da_pasta_do_seu_repositorio>  # Ex: cd CredTechDataPipelines
+```
 
-**2. Configurar o Ambiente Virtual**
+### 2. Configurar o Ambiente Virtual
+
+```bash
 python -m venv venv
+```
 
-**3. Ativar o Ambiente Virtual**
-.\venv\Scripts\activate
+### 3. Ativar o Ambiente Virtual
 
-**4. Instalar as Dependências**
+- Windows:
+
+```bash
+.env\Scriptsctivate
+```
+
+- macOS/Linux:
+
+```bash
+source venv/bin/activate
+```
+
+### 4. Instalar as Dependências
+
+```bash
 pip install -r requirements.txt
+```
 
-Exemplo de requirements.txt:
+#### Exemplo de `requirements.txt`:
 
-text
-Copiar
-Editar
+```text
 pandas>=1.3.0
 numpy>=1.20.0
 sqlalchemy>=1.4.0
 psycopg2-binary>=2.9.0
 openpyxl
 python-dateutil
+```
 
-Configuração do Banco de Dados
-Abra os arquivos em scripts/ e ajuste, se necessário, as variáveis de conexão:
+---
 
-python
-Copiar
-Editar
+## Configuração do Banco de Dados
+
+Abra os scripts em `scripts/` e ajuste os parâmetros de conexão, se necessário:
+
+```python
 DB_USER = 'jjguilherme'
 DB_PASSWORD = 'admin'
 DB_HOST = 'localhost'
 DB_PORT = '5432'
 DB_NAME = 'credtech'
-Dica: Para ambientes de produção, utilize variáveis de ambiente ou ferramentas de gerenciamento de segredos.
+```
 
-Como Executar a Pipeline ETL
-Certifique-se de que o ambiente virtual esteja ativo.
+> **Dica:** Para produção, use variáveis de ambiente em vez de deixar senhas hardcoded.
 
-1. Baixar Dados Brutos (Opcional)
-bash
-Copiar
-Editar
+---
+
+## Como Executar a Pipeline ETL
+
+Certifique-se de que o ambiente virtual esteja ativado.
+
+### 1. Baixar Dados Brutos (Opcional)
+
+```bash
 python scripts/sgl_data_installer.py
-2. Bronze → Silver
-Dados SCR:
-bash
-Copiar
-Editar
+```
+
+### 2. Processar Dados: Bronze → Silver
+
+#### Dados SCR:
+
+```bash
 python scripts/pipeline_bronze_to_silver_sgs.py
-Indicadores econômicos:
-bash
-Copiar
-Editar
+```
+
+#### Indicadores Econômicos:
+
+```bash
 python scripts/pipeline_bronze_to_silver_outros.py
-3. Silver → Gold
-Dados SCR:
-bash
-Copiar
-Editar
+```
+
+### 3. Processar Dados: Silver → Gold
+
+#### Dados SCR:
+
+```bash
 python scripts/pipeline_silver_to_gold_sgs.py
-Indicadores econômicos:
-bash
-Copiar
-Editar
+```
+
+#### Indicadores Econômicos:
+
+```bash
 python scripts/pipeline_silver_to_gold_outros.py
-4. Gold → PostgreSQL
-Dados SCR:
-bash
-Copiar
-Editar
+```
+
+### 4. Carregar Dados: Gold → PostgreSQL
+
+#### Dados SCR:
+
+```bash
 python scripts/python_load_gold_aggr_to_db.py
-Indicadores econômicos:
-bash
-Copiar
-Editar
+```
+
+#### Indicadores Econômicos:
+
+```bash
 python scripts/python_load_gold_outros_to_db.py
-Logs
-Todos os scripts geram arquivos .log para monitoramento e depuração. Verifique arquivos como:
+```
 
-etl_pipeline.log
+---
 
-etl_gold_pipeline.log
+## Logs
 
-etl_pipeline_outros.log
+Todos os scripts geram arquivos `.log` para monitoramento e depuração. Verifique arquivos como:
 
-etc.
+- `etl_pipeline.log`
+- `etl_gold_pipeline.log`
+- `etl_pipeline_outros.log`
+- `load_gold_aggr_to_db.log`
+- etc.
 
-Contribuição
+---
+
+## Contribuição
+
 Sinta-se à vontade para contribuir! Faça um fork do repositório, crie uma branch com suas mudanças e envie um Pull Request.
 
-Licença
-Este projeto está licenciado sob a Licença MIT.
+---
 
-go
-Copiar
-Editar
+## Licença
 
-Se quiser, posso gerar o arquivo `.md` pronto para download também. Deseja isso?
-```
+Este projeto está licenciado sob a Licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
