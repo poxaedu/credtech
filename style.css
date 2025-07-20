@@ -1,0 +1,100 @@
+/* style.css */
+
+/* Estilo para remover espaço extra no topo da página */
+.block-container {
+    padding-top: 1.5rem;
+}
+
+.dashboard-title {
+    text-align: center;
+    background: linear-gradient(90deg, #1e40af, #3b82f6);
+    color: white;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin: 0 0 2rem 0;
+    font-size: 2.5rem;
+    font-weight: 600;
+}
+
+/* Headers de Seção (títulos principais das páginas) */
+.section-header {
+    background: #ffffff;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid #3b82f6;
+    margin: 1rem 0 2rem 0;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.section-header h1 {
+    margin: 0;
+    font-size: 2.2rem;
+}
+
+/* Cards de Título (subtítulos dentro das páginas) */
+.title-card {
+    background-color: #F0F8FF;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    margin-bottom: 1.5rem;
+}
+
+.title-card h3 {
+    margin: 0;
+    color: #1e40af;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Estilo para as métricas na coluna ao lado do mapa */
+.financial-metric-item {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 8px solid #3b82f6;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.financial-metric-title {
+    font-size: 0.9rem;
+    color: #64748b; /* Cinza azulado */
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.financial-metric-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1e40af;
+}
+
+/* Opcional: Aumentar o tamanho da fonte dos botões de navegação */
+/* --- NOVA SEÇÃO: DEFINIR A COR DO BOTÃO ATIVO VIA CSS --- */
+
+/* Alvo: O botão que o Python marca como type="primary" */
+/* O Streamlit usa o atributo data-testid para identificar os tipos de botão */
+
+button[data-testid="baseButton-primary"] {
+    background-color: #3b82f6; /* A cor azul que você queria */
+    color: white; /* Texto branco para contraste */
+    border: 1px solid #3b82f6; /* Borda da mesma cor */
+}
+
+/* Efeito hover (mouse em cima) para o botão ativo */
+button[data-testid="baseButton-primary"]:hover {
+    background-color: #2b56c8; /* Um tom de azul um pouco mais escuro */
+    border-color: #2b56c8;
+}
+
+/* Opcional: Garante que o botão inativo fique como o padrão */
+button[data-testid="baseButton-secondary"] {
+    background-color: #f0f2f6;
+    color: #4b5563;
+    border: 1px solid #d1d5db;
+}
