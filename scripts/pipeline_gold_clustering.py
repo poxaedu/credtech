@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 logger.info("Script de Clusterização (Gold -> PostgreSQL) - Iniciado.")
 
 # --- Configurações de Conexão com PostgreSQL (SUAS CREDENCIAIS) ---
-DB_USER = 'jjguilherme'
+DB_USER = 'rogerym'
 DB_PASSWORD = 'admin'
 DB_HOST = 'localhost'
 DB_PORT = '5432'

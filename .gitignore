@@ -1,3 +1,101 @@
+# Ambientes virtuais Python
+venv/
+.env/
+.venv/
+env/
+ENV/
+
+# Arquivos de cache do Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Logs e arquivos temporários
+*.log
+*.out
+*.err
+*.pid
+*.swp
+*.swo
+*.bak
+*.tmp
+*.temp
+
+# Dados de ETL (suas pastas de dados)
 bronze/
 silver/
 gold/
+data/
+raw_data/
+
+# Cache do Streamlit
+.streamlit/
+.cache/
+
+# Arquivos de configuração sensíveis
+*.env
+.env.*
+config.ini
+secrets.toml
+
+# Arquivos de banco de dados
+*.sqlite3
+*.db
+*.db-journal
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+*.~
+*~
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Arquivos de dados processados
+*.feather
+*.parquet
+*.pickle
+*.pkl
+
+# Arquivos de lock
+Pipfile.lock
+poetry.lock
+yarn.lock
+package-lock.json
+
+# Arquivos de backup
+*.backup
+*.bkp
+
+# Arquivos de teste
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Arquivos específicos do Windows
+ehthumbs.db
+Desktop.ini
+
+# Arquivos específicos do macOS
+.AppleDouble
+.LSOverride
+
+# Arquivos específicos do Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*

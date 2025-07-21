@@ -42,7 +42,7 @@ logging.info("-" * 50)
 
 
 # --- Configurações de Conexão com PostgreSQL Local ---
-DB_USER = 'jjguilherme'
+DB_USER = 'rogerym'
 DB_PASSWORD = 'admin'
 DB_HOST = 'localhost'
 DB_PORT = '5432'

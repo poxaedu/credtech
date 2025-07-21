@@ -31,7 +31,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GOLD_AGGR_INPUT_PATH = os.path.join(BASE_DIR, 'data', 'gold', 'scr-tratado')
 
 # --- Configurações de Conexão com PostgreSQL Local (SEUS VALORES REAIS) ---
-DB_USER = 'jjguilherme'
+DB_USER = 'rogerym'
 DB_PASSWORD = 'admin'
 DB_HOST = 'localhost'
 DB_PORT = '5432'

@@ -133,8 +133,8 @@ if __name__ == '__main__':
 
     # Definindo o período de processamento (DEVE SER O MESMO DO BRONZE->SILVER)
     # Ajuste estas datas para corresponder aos seus arquivos reais
-    start_date_process = date(2024, 1, 1) # Mude para 2024, 1, 1 se seus dados começam em 202401
-    end_date_process = date(2025, 4, 1) # Ajuste a data final conforme seus arquivos (considerando 18 de julho de 2025, esta data final é plausível)
+    start_date_process =  date(2024, 1, 1) # Primeiro mês de dados
+    end_date_process = date(2025, 5, 1) # Ajuste a data final conforme seus arquivos (considerando 18 de julho de 2025, esta data final é plausível)
 
     current_date_loop = start_date_process
 
