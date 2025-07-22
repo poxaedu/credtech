@@ -1,0 +1,206 @@
+/* style.css */
+
+/* Estilo para remover espaço extra no topo da página */
+.block-container {
+    padding-top: 1.5rem;
+}
+
+.dashboard-title {
+    text-align: center;
+    background: linear-gradient(90deg, #054801, #1d7127);
+    color: white;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin: 0 0 2rem 0;
+    font-size: 2.5rem;
+    font-weight: 600;
+}
+
+/* Headers de Seção (títulos principais das páginas) */
+.section-header {
+    max-width: 100%; /* Limita a largura do header para não ocupar toda a tela */
+    margin: 0 auto; /* Centraliza o header */
+    margin-left: auto;
+    background: #eafce5;
+    padding: 16px;
+    border-radius: 0.75rem;
+    border-bottom: 6px solid #054801;
+    margin: 8px 0 16px 0;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.section-header h1 {
+    margin: 0;
+    font-size: 24px;
+    color: #054801;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 1.5rem;
+    color: #054801;
+}
+.section-header h2 {
+    margin: 0;
+    font-size: 24px;
+    color: #054801;
+}
+
+/* Cards de Título (subtítulos dentro das páginas) */
+.title-card {
+    background-color: #F0F8FF;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    margin-bottom: 1.5rem;
+}
+
+.title-card h3 {
+    margin: 0;
+    color: #054801;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Estilo para as métricas na coluna ao lado do mapa */
+.financial-metric-item {
+    background-color: #fdfdfd;
+    border: 1px solid #e2e8f0;
+    border-right: 4px solid #054801;
+    border-bottom: 4px solid #054801;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.financial-metric-title {
+    font-size: 16px;
+    color: #31373f; /* Cinza azulado */
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.financial-metric-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: rgb(5, 70, 30);
+}
+
+/* Adicione este CSS ao seu bloco <style> no Home.py */
+
+.financial-metric-value-container {
+    display: flex;
+    align-items: center; /* Alinha o valor e a pílula na mesma linha */
+    gap:  16px; /* Espaço entre o valor e a pílula */
+}
+
+.unit-pill {
+    background-color: #146e20; /* Cor de fundo da pílula */
+    color: #ffffff; /* Cor do texto da pílula */
+    padding: 2px 8px;
+    border-radius: 12px; /* Deixa bem arredondado */
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.card-sub-text {
+    font-size: 1rem;
+    color: #444;
+    margin: 0;
+    text-align: center;
+}
+
+.card-metric-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #003f0a;
+    margin: 0;
+    text-align: center;
+}
+
+.custom-card-section {
+    background-color: #fff;
+    padding: 1rem;
+    border-radius: 16px;
+    box-shadow: 0px 6px 6px 6px rgba(7, 8, 6, 0.06);
+    border: 0.5px  solid #68916e;
+}
+.custom-card-section h3 {
+    font-size: 1.25rem;
+    color: #054801;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+.custom-card-section h2 {
+    font-size: 1.25rem;
+    color: #1e3f03;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+.custom-card-section h4 {
+    font-size: 1.25rem;
+    color: #054801;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+.custom-card-section p {
+    font-size: 1rem;
+    color: #1b1c1f;
+    margin: 0.25rem 0;
+    text-align: center;
+}
+/* Estilo para o botão de download */
+.download-button {
+    background-color: #054801; /* Cor de fundo verde escuro */                              
+    color: white; /* Cor do texto */
+    padding: 0.5rem 1rem; /* Espaçamento interno */
+    border: none; /* Remove bordas */
+    border-radius: 0.5rem; /* Bordas arredondadas */
+    cursor: pointer; /* Muda o cursor para indicar que é clicável */
+    font-size: 1rem; /* Tamanho da fonte */
+    font-weight: 600; /* Negrito */
+    transition: background-color 0.3s ease; /* Transição suave para a cor
+    hover */
+}
+
+.single-metric-item {
+    display: flex;
+    flex-direction: column; /* Empilha os itens verticalmente */
+    align-items: center;   /* Centraliza os itens (pill e valor) horizontalmente dentro deste contêiner */
+    gap: 8px;              /* Espaçamento entre a pill e o valor */
+    /* Adicione padding ou margin se precisar de espaço entre os 'single-metric-item's */
+}
+
+/* Estilo para a "pill" da UF */
+.uf-unit-pill {
+    background-color: #6c9a75; /* Cor de fundo da pill */
+    color: white;              /* Cor do texto na pill */
+    padding: 6px 16px;         /* Preenchimento interno da pill */
+    border-radius: 20px;       /* Cantos arredondados para a forma de pill */
+    font-weight: bold;
+    text-align: center;        /* Garante que o texto dentro da pill esteja centralizado */
+    white-space: nowrap;       /* Evita que o texto quebre linha dentro da pill */
+    display: inline-flex;      /* Permite que a pill se ajuste ao conteúdo e seja um flex item */
+    align-items: center;       /* Centraliza o conteúdo verticalmente dentro da pill */
+    justify-content: center;   /* Centraliza o conteúdo horizontalmente dentro da pill */
+    min-width: 70px;           /* Garante uma largura mínima para a pill, se desejar uniformidade */
+}
+
+.card-metric-value {
+    font-size: 1.5em; /* Adjust font size as needed */
+    font-weight: bold;
+    color: #1a5e2e; /* Example color, adjust as needed */
+    margin-top: 0; /* Remove default margin to control spacing with parent's gap */
+    margin-bottom: 0; /* Remove default margin */
+}
+
+.uf-unit-pill {
+    background-color: #5a9662; /* Cor de fundo da pílula */
+    color: #ffffff; /* Cor do texto da pílula */
+    padding: 2px 8px;
+    border-radius: 12px; /* Deixa bem arredondado */
+    font-size: 14px;
+    font-weight: 600;
+}
