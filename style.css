@@ -2,18 +2,20 @@
 
 /* Estilo para remover espaço extra no topo da página */
 .block-container {
-    padding-top: 1.5rem;
+    padding-top: 1.0rem;
 }
 
 .dashboard-title {
     text-align: center;
-    background: linear-gradient(90deg, #054801, #1d7127);
+    background: linear-gradient(90deg, #186f13, #238e2f);
     color: white;
     padding: 1rem;
     border-radius: 0.75rem;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     margin: 0 0 2rem 0;
-    font-size: 2.5rem;
+    margin-top: 30px;
+    width: 100%;
+    font-family: 'Poppins', sans-serif;
     font-weight: 600;
 }
 
@@ -22,10 +24,10 @@
     max-width: 100%; /* Limita a largura do header para não ocupar toda a tela */
     margin: 0 auto; /* Centraliza o header */
     margin-left: auto;
-    background: #eafce5;
+    background: #ffffff;
     padding: 16px;
     border-radius: 0.75rem;
-    border-bottom: 6px solid #054801;
+    border: 1px solid #054801;
     margin: 8px 0 16px 0;
     text-align: center;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -41,6 +43,11 @@
     color: #054801;
 }
 .section-header h2 {
+    margin: 0;
+    font-size: 24px;
+    color: #054801;
+}
+.section-header h3 {
     margin: 0;
     font-size: 24px;
     color: #054801;
@@ -66,9 +73,9 @@
 .financial-metric-item {
     background-color: #fdfdfd;
     border: 1px solid #e2e8f0;
-    border-right: 4px solid #054801;
-    border-bottom: 4px solid #054801;
-    border-radius: 0.5rem;
+    border-right: 4px solid #066d00;
+    border-bottom: 4px solid #066d00;
+    border-radius: 16px;
     padding: 1rem;
     margin-bottom: 1.25rem;
     align-items: center;
@@ -124,7 +131,7 @@
     background-color: #fff;
     padding: 1rem;
     border-radius: 16px;
-    box-shadow: 0px 6px 6px 6px rgba(7, 8, 6, 0.06);
+    box-shadow: 0px 6px 0px 0px rgba(7, 8, 6, 0.06);
     border: 0.5px  solid #68916e;
 }
 .custom-card-section h3 {
@@ -151,31 +158,16 @@
     margin: 0.25rem 0;
     text-align: center;
 }
-/* Estilo para o botão de download */
-.download-button {
-    background-color: #054801; /* Cor de fundo verde escuro */                              
-    color: white; /* Cor do texto */
-    padding: 0.5rem 1rem; /* Espaçamento interno */
-    border: none; /* Remove bordas */
-    border-radius: 0.5rem; /* Bordas arredondadas */
-    cursor: pointer; /* Muda o cursor para indicar que é clicável */
-    font-size: 1rem; /* Tamanho da fonte */
-    font-weight: 600; /* Negrito */
-    transition: background-color 0.3s ease; /* Transição suave para a cor
-    hover */
-}
-
 .single-metric-item {
-    display: flex;
-    flex-direction: column; /* Empilha os itens verticalmente */
-    align-items: center;   /* Centraliza os itens (pill e valor) horizontalmente dentro deste contêiner */
-    gap: 8px;              /* Espaçamento entre a pill e o valor */
-    /* Adicione padding ou margin se precisar de espaço entre os 'single-metric-item's */
+  display: center;             /* Ativa o layout flexível */
+  flex-direction: column;
+  justify-content: space-around;   /* Empilha os itens (pill e valor) um sobre o outro */
+  align-items: row;       /* Centraliza horizontalmente os itens da coluna */
+  gap: 8px;                  /* Cria um espaço vertical entre o pill e o valor */
 }
-
 /* Estilo para a "pill" da UF */
 .uf-unit-pill {
-    background-color: #6c9a75; /* Cor de fundo da pill */
+    background-color: #008e13; /* Cor de fundo da pill */
     color: white;              /* Cor do texto na pill */
     padding: 6px 16px;         /* Preenchimento interno da pill */
     border-radius: 20px;       /* Cantos arredondados para a forma de pill */
@@ -195,12 +187,525 @@
     margin-top: 0; /* Remove default margin to control spacing with parent's gap */
     margin-bottom: 0; /* Remove default margin */
 }
+.segment-metric-item {
+    background-color: #ffffff;
+    border: 0.5px solid #e2e8f0;
+    border-right: 4px solid #4a6547;
+    border-bottom: 4px solid #4a6547;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
 
-.uf-unit-pill {
-    background-color: #5a9662; /* Cor de fundo da pílula */
-    color: #ffffff; /* Cor do texto da pílula */
+.segment-metric-title {
+    font-size: 16px;
+    color: #095221; /* Cinza azulado */
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.segment-metric-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: rgb(5, 70, 30);
+}
+.seg-unit-pill {
+    background-color: #ffffff; /* Cor de fundo da pílula */
+    color: #054801; /* Cor do texto da pílula */
     padding: 2px 8px;
     border-radius: 12px; /* Deixa bem arredondado */
     font-size: 14px;
     font-weight: 600;
+}
+
+.segment-metric-value-container {
+    display: flex;
+    align-items: center; /* Alinha o valor e a pílula na mesma linha */
+    gap:  16px; /* Espaço entre o valor e a pílula */
+}
+/* Contêiner verde claro externo */
+.status-banner {
+    background-color: #e7f3e8; /* Verde bem claro */
+    border-radius: 16px;
+    padding: 8px;
+    text-align: center;
+    color: #2e7d32;
+    font-weight: 500;
+}
+
+/* O conteúdo dentro do card branco, para centralizar tudo */
+.status-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px; /* Espaço entre os itens */
+}
+
+/* Texto principal do card */
+.status-card-main-text {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+/* Botão branco com borda cinza */
+.status-card-button {
+    background-color: white;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #495057;
+    cursor: pointer;
+}
+/* --- Estilos para o Card de Perfil do Cluster --- */
+
+.profile-card {
+  padding: 1.5rem;
+  border-radius: 8px;
+  background-color: #f8f9fa; /* Cor de fundo suave */
+  margin-top: 1rem;
+  margin-bottom: 1rem; /* ADICIONADO: Cria um espaço entre o seletor e o card */ /* ADICIONADO: Garante que o padding não cause sobreposição */
+  width: 100%; /* ADICIONADO: Garante que o card ocupe a largura correta */
+}
+
+.profile-section {
+    margin-bottom: 1.5rem; /* Espaçamento entre seções */
+    padding: 1rem;
+    background-color: #ffffff; /* Fundo branco para contraste */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Sombra suave */
+}
+
+.profile-section-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #4a5568;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.5rem;
+}
+
+.feature-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0.2rem;
+  border-bottom: 1px solid #eef2f7;
+  font-size: 0.95rem;
+}
+
+.feature-row:last-child {
+  border-bottom: none;
+}
+
+.feature-label {
+  color: #2d3748;
+}
+
+.feature-value {
+  font-weight: 600;
+  color: #1a202c;
+}
+
+.categorical-pill {
+  background-color: #d1f2e1; /* Verde claro, combinando com a paleta */
+  color: #45a86d; /* Verde escuro */
+  padding: 0.25rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  align-self: center;
+  text-align: center;/* Centraliza verticalmente */
+  font-weight: 600;
+}
+.correlation-categorical-pill {
+  background-color: #d1f2e1; /* Verde claro, combinando com a paleta */
+  color: #006d2c; /* Verde escuro */
+  padding: 0.25rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  align-self: center;
+  text-align: center;/* Centraliza verticalmente */
+  font-weight: 600;
+}
+
+/* Estilos para cards de correlação */
+.high-correlation {
+    border-left: 4px solid #d32f2f; /* Vermelho para correlação alta */
+    background-color: #ffffff;
+}
+
+.medium-correlation {
+    border-left: 4px solid #f57c00; /* Laranja para correlação média */
+    background-color: #ffffff;
+}
+
+.low-correlation {
+    border-left: 4px solid #388e3c; /* Verde para correlação baixa */
+    background-color: #ffffff;
+}
+
+.card-correlation-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1b1c1f;
+    margin-bottom: 0.5rem;
+    margin-left: 0.5rem;
+    text-align: center;
+}
+
+.card-correlation-subtitle {
+    font-size: 0.9rem;
+    color: #718096;
+    text-align: center;
+    margin-top: 0.25rem;
+}
+
+/* Banner para agrupar os cards de correlação */
+.correlation-banner {
+    background-color: #f8f9fa; /* Cinza bem claro */
+    border: 1px solid #e9ecef;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 1.5rem;
+}
+
+/* Container para alinhar os cards lado a lado dentro do banner */
+.correlation-cards-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px; /* Espaço entre os cards */
+}
+
+.custom-card-section {
+    background-color: #fff;
+    padding: 1rem;
+    border-radius: 16px;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.06);
+    border: 1px solid #e9ecef;
+    text-align: center;
+}
+.card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+.correlation-categorical-pill {
+    font-size: 1.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+    display: inline-block;
+    background-color: hwb(0 99% 1%);
+    margin-bottom: 0.5rem;
+}
+.card-correlation-subtitle {
+    font-size: 0.8rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.high-correlation .correlation-categorical-pill { color: #a02d00; }
+.medium-correlation .correlation-categorical-pill { color: #e78805; }
+.low-correlation .correlation-categorical-pill {color: #0e5479; }
+
+/* Estilos para o banner */
+.correlation-banner {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 1.5rem;
+}
+.correlation-cards-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+/* Estilos para a tabela de insights (reaproveitados de cluster.py) */
+.profile-card {
+  padding: 1.5rem;
+  border-radius: 8px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  margin-top: 1rem;
+}
+.profile-section-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #4a5568;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.5rem;
+}
+.feature-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0.2rem;
+  border-bottom: 1px solid #d8d8d8;
+  font-size: 0.95rem;
+}
+.feature-row:last-child {
+  border-bottom: none;
+}
+.feature-label {
+  color: #0f120f;
+  font-weight: 500;
+}
+.interpretation-text {
+    font-size: 0.9rem;
+    color: #1b1c1f;
+    margin-bottom: 1rem;
+    padding-left: 1rem;
+    text-align: left;
+    border-left: 3px solid #e2e8f0;
+}
+/* Novas classes para as pills coloridas na tabela de insights */
+.pill-red {
+    background-color: #ffebee !important;
+    color: #c62828 !important;
+}
+
+.pill-green {
+    background-color: #e8f5e9 !important;
+    color: #2e7d32 !important;
+}
+
+.pill-yellow {
+    background-color: #fffde7 !important;
+    color: #f57f17 !important;
+}
+
+/* CSS para remover o link/âncora padrão do Streamlit */
+h1 > div > a,
+h2 > div > a,
+h3 > div > a,
+h4 > div > a,
+h5 > div > a,
+h6 > div > a {
+    display: none !important;
+}
+
+[data-testid="stMetricValue"] a {
+    display: none !important;
+}
+
+a.streamlit-anchor {
+    display: none !important;
+}/* style.css */
+
+/* ... (seus estilos existentes) ... */
+
+/* Contêiner para a mini-tabela de informações do modelo */
+.model-info-table-container {
+    background-color: #ffffff; /* Fundo branco para o card da tabela */
+    padding: 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05); /* Sombra suave */
+    border: 1px solid #e2e8f0; /* Borda sutil */
+    margin-bottom: 1.5rem; /* Espaço abaixo da tabela */
+}
+
+/* Estilo para cada "linha" da mini-tabela */
+.model-info-table-row {
+    display: flex; /* Para alinhar o label e o valor */
+    justify-content: space-between; /* Espaço entre label e valor */
+    align-items: center; /* Alinha verticalmente */
+    padding: 0.5rem 0; /* Preenchimento vertical para as linhas */
+    border-bottom: 1px solid #d8d8d8; /* Linha separadora */
+}
+
+/* Remover a borda inferior da última linha */
+.model-info-table-row:last-child {
+    border-bottom: none;
+}
+
+/* Estilo para o label (ex: "Última atualização:") */
+.model-info-label {
+    font-weight: 600; /* Negrito */
+    color: #31373f; /* Cor do texto */
+    font-size: 0.95rem;
+    flex-shrink: 0; /* Impede que o label encolha */
+    margin-right: 10px; /* Espaço entre o label e a pill */
+}
+
+/* Estilos para as "pills" de valores na mini-tabela */
+/* Reutilizando as classes existentes ou as que criamos antes */
+.model-info-pill {
+    background-color: #e0f2f7; /* Azul claro */
+    color: #0d47a1; /* Texto azul escuro */
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.85rem; /* Um pouco menor para caber na tabela */
+    font-weight: 500;
+    display: inline-block;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    white-space: nowrap;
+    line-height: 1.2;
+    text-align: right; /* Alinha o texto da pill à direita */
+}
+
+.model-info-status-pill {
+    background-color: #e8f5e9; /* Verde claro */
+    color: #2e7d32; /* Texto verde escuro */
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: inline-block;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    white-space: nowrap;
+    line-height: 1.2;
+    text-align: right;
+}
+/* style.css */
+
+/* ... (seus estilos existentes) ... */
+
+/* Estilos para as pills clicáveis do seletor de séries */
+.chart-pill-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px; /* Espaço entre as pills */
+    margin-bottom: 1rem;
+    justify-content: center; /* Centraliza as pills */
+}
+
+.chart-pill {
+    background-color: #f0f2f6; /* Cor de fundo padrão (inativa) */
+    color: #495057; /* Cor do texto padrão */
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid #ced4da; /* Borda sutil */
+    transition: all 0.2s ease-in-out; /* Transição suave ao hover/ativar */
+    white-space: nowrap; /* Evita quebra de linha */
+}
+
+.chart-pill:hover {
+    background-color: #e2e6eb;
+    border-color: #aeb5bc;
+}
+
+.chart-pill.active {
+    background-color: #186f13; /* Cor de fundo ativa (verde) */
+    color: white; /* Texto branco */
+    border-color: #186f13;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Estilos para o cabeçalho do gráfico (Avg. Registration, Data Selector, Buttons) */
+.chart-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap; /* Permite quebrar linha em telas menores */
+    gap: 15px; /* Espaço entre os blocos do header */
+}
+
+.chart-metric-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #31373f;
+}
+
+.chart-metric-pill {
+    background-color: #d1f2e1; /* Verde claro */
+    color: #006d2c; /* Verde escuro */
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    white-space: nowrap;
+}
+
+.chart-metric-percent-pill {
+    background-color: #e8f5e9; /* Verde mais claro */
+    color: #2e7d32; /* Verde */
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    white-space: nowrap;
+}
+
+.chart-date-selector-display {
+    background-color: #f0f2f6;
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer; /* Indica que é clicável */
+}
+
+.chart-icon-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.chart-icon-button {
+    font-size: 1.4rem; /* Tamanho dos ícones */
+    color: #6c757d;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.chart-icon-button:hover {
+    color: #343a40;
+}
+
+/* Estilos para os cards de métricas (novos/reforçados) */
+.metric-card {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 1rem;
+    height: 100%; /* Garante que os cards na mesma linha tenham a mesma altura */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.metric-title {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.metric-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+}
+
+.metric-delta {
+    font-size: 0.8rem;
+    color: #4b5563;
 }

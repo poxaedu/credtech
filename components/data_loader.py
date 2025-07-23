@@ -6,6 +6,9 @@ import json
 import streamlit as st
 from google.cloud import bigquery
 from google.api_core.exceptions import GoogleAPICallError
+import numpy as np
+from datetime import datetime, timedelta
+from scipy.stats import pearsonr, spearmanr
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +32,12 @@ def get_bigquery_client():
         logger.error(f"Erro crítico ao conectar ao BigQuery: {e}", exc_info=True)
         st.error("Não foi possível conectar ao BigQuery. Verifique a autenticação e as permissões.")
         st.stop()
+
+# --- Função de Correção para Dados Corrompidos ---
+def substituir_replacement_char(df: pd.DataFrame) -> pd.DataFrame:
+    for col in df.select_dtypes(include="object").columns:
+        df[col] = df[col].str.replace('�', 'ç', regex=False)
+    return df
 
 # --- Funções de Consulta Específicas para cada Análise ---
 
@@ -62,12 +71,20 @@ def get_dados_por_segmento(_client: bigquery.Client, segmento_dim: str) -> pd.Da
         st.error(f"Dimensão de análise '{segmento_dim}' inválida.")
         return pd.DataFrame()
 
+    # Adiciona filtros para excluir combinações inválidas
+    where_clause = ""
+    if segmento_dim in ['ocupacao']:
+        where_clause = "WHERE cliente = 'PF'"  # Ocupação só para PF
+    elif segmento_dim in ['cnae_secao', 'cnae_subclasse']:
+        where_clause = "WHERE cliente = 'PJ'"  # CNAE só para PJ
+
     query = f"""
         SELECT
             {segmento_dim},
             SUM(taxa_inadimplencia_final_segmento * total_carteira_ativa_segmento) / NULLIF(SUM(total_carteira_ativa_segmento), 0) AS taxa_inadimplencia_media,
             SUM(total_carteira_ativa_segmento) AS volume_carteira_total
         FROM `{PROJECT_ID}.{DATASET_ID}.ft_scr_agregado_mensal`
+        {where_clause}
         GROUP BY {segmento_dim}
     """
     try:
@@ -78,6 +95,52 @@ def get_dados_por_segmento(_client: bigquery.Client, segmento_dim: str) -> pd.Da
         return pd.DataFrame()
 
 @st.cache_data(ttl=3600)
+def get_dados_top_n_segmento(_client: bigquery.Client, segmento_dim: str, top_n: int = 20, order_by: str = 'taxa_inadimplencia_media') -> pd.DataFrame:
+    """
+    Busca os Top N segmentos por uma dimensão, ordenados por uma métrica.
+    """
+    logger.info(f"Executando query Top {top_n} para '{segmento_dim}' ordenado por '{order_by}'...")
+
+    # Validação de segurança
+    colunas_permitidas = ['uf', 'cliente', 'modalidade', 'ocupacao', 'porte', 'cnae_secao', 'cnae_subclasse']
+    order_by_permitido = ['taxa_inadimplencia_media', 'volume_carteira_total']
+    if segmento_dim not in colunas_permitidas or order_by not in order_by_permitido:
+        st.error("Parâmetros de análise inválidos.")
+        return pd.DataFrame()
+
+    # Adicionar filtros baseados no tipo de cliente
+    where_clause = ""
+    if segmento_dim == 'ocupacao':
+        where_clause = "WHERE cliente = 'PF'"
+    elif segmento_dim in ['cnae_secao', 'cnae_subclasse']:
+        where_clause = "WHERE cliente = 'PJ'"
+
+    query = f"""
+        SELECT
+            {segmento_dim},
+            SUM(taxa_inadimplencia_final_segmento * total_carteira_ativa_segmento) / NULLIF(SUM(total_carteira_ativa_segmento), 0) AS taxa_inadimplencia_media,
+            SUM(total_carteira_ativa_segmento) AS volume_carteira_total
+        FROM
+            `{PROJECT_ID}.{DATASET_ID}.ft_scr_agregado_mensal`
+        {where_clause}
+        GROUP BY
+            {segmento_dim}
+        HAVING -- Ignora segmentos com volume irrelevante para uma análise de risco mais limpa
+            SUM(total_carteira_ativa_segmento) > 1000 
+        ORDER BY
+            {order_by} DESC
+        LIMIT {top_n}
+    """
+    try:
+        df = _client.query(query).to_dataframe()
+        df = substituir_replacement_char(df)
+        return df
+    except Exception as e:
+        logger.error(f"Erro na query get_dados_top_n_segmento: {e}", exc_info=True)
+        st.error("Não foi possível carregar os dados do Top N.")
+        return pd.DataFrame()
+
+@st.cache_data(ttl=3600)
 def get_dados_tendencia_temporal(_client: bigquery.Client) -> pd.DataFrame:
     """Busca e junta os dados de SCR e indicadores, já agregados por mês."""
     logger.info("Executando query para Tendência Temporal no BigQuery...")
@@ -85,8 +148,10 @@ def get_dados_tendencia_temporal(_client: bigquery.Client) -> pd.DataFrame:
         WITH scr_mensal AS (
             SELECT
                 DATE_TRUNC(data_base, MONTH) AS mes,
-                AVG(taxa_inadimplencia_final_segmento) AS taxa_inadimplencia_media
+                SUM(taxa_inadimplencia_final_segmento * total_carteira_ativa_segmento) / 
+                NULLIF(SUM(total_carteira_ativa_segmento), 0) AS taxa_inadimplencia_media
             FROM `{PROJECT_ID}.{DATASET_ID}.ft_scr_agregado_mensal`
+            WHERE DATE_TRUNC(data_base, MONTH) >= '2024-05-01'
             GROUP BY mes
         ),
         indicadores_mensal AS (
@@ -96,6 +161,7 @@ def get_dados_tendencia_temporal(_client: bigquery.Client) -> pd.DataFrame:
                 AVG(valor_ipca) as valor_ipca,
                 AVG(taxa_selic_meta) as taxa_selic_meta
             FROM `{PROJECT_ID}.{DATASET_ID}.ft_indicadores_economicos_mensal`
+            WHERE DATE_TRUNC(data_base, MONTH) >= '2024-05-01'
             GROUP BY mes
         )
         SELECT * FROM scr_mensal LEFT JOIN indicadores_mensal USING(mes) ORDER BY mes
@@ -109,7 +175,7 @@ def get_dados_tendencia_temporal(_client: bigquery.Client) -> pd.DataFrame:
 
 @st.cache_data(ttl=3600)
 def get_dados_inadimplencia_por_cluster(_client: bigquery.Client) -> pd.DataFrame:
-    """Busca a taxa de inadimplência média para cada cluster."""
+    """Busca dados de inadimplência agregados por cluster."""
     logger.info("Executando query de inadimplência por cluster no BigQuery...")
     query = f"""
         SELECT
@@ -120,7 +186,9 @@ def get_dados_inadimplencia_por_cluster(_client: bigquery.Client) -> pd.DataFram
         ORDER BY cluster_id
     """
     try:
-        return _client.query(query).to_dataframe()
+        df = _client.query(query).to_dataframe()
+        df = substituir_replacement_char(df)  # Adicionar esta linha
+        return df
     except GoogleAPICallError as e:
         logger.error(f"Erro na query get_dados_inadimplencia_por_cluster: {e}", exc_info=True)
         st.error("Não foi possível carregar a análise de clusters.")
@@ -132,7 +200,9 @@ def load_full_cluster_data(_client: bigquery.Client) -> pd.DataFrame:
     logger.info("Carregando TODOS os dados da tabela 'ft_scr_segmentos_clusters'.")
     query = f"SELECT * FROM `{PROJECT_ID}.{DATASET_ID}.ft_scr_segmentos_clusters`"
     try:
-        return _client.query(query).to_dataframe()
+        df = _client.query(query).to_dataframe()
+        df = substituir_replacement_char(df)  # Adicionar esta linha
+        return df
     except GoogleAPICallError as e:
         logger.error(f"Erro ao carregar dados completos de cluster: {e}", exc_info=True)
         st.error("Não foi possível carregar os dados de clusterização.")
@@ -144,7 +214,9 @@ def load_cluster_profiles(_client: bigquery.Client) -> pd.DataFrame:
     logger.info("Carregando perfis dos clusters (dim_cluster_profiles)...")
     query = f"SELECT * FROM `{PROJECT_ID}.{DATASET_ID}.dim_cluster_profiles`"
     try:
-        return _client.query(query).to_dataframe()
+        df = _client.query(query).to_dataframe()
+        df = substituir_replacement_char(df)  # Adicionar esta linha
+        return df
     except GoogleAPICallError as e:
         logger.error(f"Erro ao carregar perfis de clusters: {e}", exc_info=True)
         st.error("Não foi possível carregar os perfis dos clusters.")
@@ -164,7 +236,9 @@ def get_top_combinacoes_risco(_client: bigquery.Client, top_n: int = 20) -> pd.D
         LIMIT {top_n}
     """
     try:
-        return _client.query(query).to_dataframe()
+        df = _client.query(query).to_dataframe()
+        df = substituir_replacement_char(df)  # Adicionar esta linha
+        return df
     except GoogleAPICallError as e:
         logger.error(f"Erro na query get_dados_top_combinacoes_risco: {e}", exc_info=True)
         st.error("Não foi possível carregar os dados de Top Combinações de Risco.")
@@ -196,7 +270,7 @@ def get_dados_comparativo_riscos(_client: bigquery.Client, comparison_dims: list
         logger.error(f"Erro na query get_dados_comparativo_riscos: {e}", exc_info=True)
         st.error("Não foi possível carregar os dados para a comparação.")
         return pd.DataFrame()
-    
+
 @st.cache_data(ttl=3600)
 def get_dados_top_n_segmento(_client: bigquery.Client, segmento_dim: str, top_n: int = 20, order_by: str = 'taxa_inadimplencia_media') -> pd.DataFrame:
     """
@@ -211,6 +285,13 @@ def get_dados_top_n_segmento(_client: bigquery.Client, segmento_dim: str, top_n:
         st.error("Parâmetros de análise inválidos.")
         return pd.DataFrame()
 
+    # Adiciona filtros para excluir combinações inválidas
+    where_clause = ""
+    if segmento_dim in ['ocupacao']:
+        where_clause = "WHERE cliente = 'PF'"  # Ocupação só para PF
+    elif segmento_dim in ['cnae_secao', 'cnae_subclasse']:
+        where_clause = "WHERE cliente = 'PJ'"  # CNAE só para PJ
+
     query = f"""
         SELECT
             {segmento_dim},
@@ -218,6 +299,7 @@ def get_dados_top_n_segmento(_client: bigquery.Client, segmento_dim: str, top_n:
             SUM(total_carteira_ativa_segmento) AS volume_carteira_total
         FROM
             `{PROJECT_ID}.{DATASET_ID}.ft_scr_agregado_mensal`
+        {where_clause}
         GROUP BY
             {segmento_dim}
         HAVING -- Ignora segmentos com volume irrelevante para uma análise de risco mais limpa
@@ -227,12 +309,14 @@ def get_dados_top_n_segmento(_client: bigquery.Client, segmento_dim: str, top_n:
         LIMIT {top_n}
     """
     try:
-        return _client.query(query).to_dataframe()
+        df = _client.query(query).to_dataframe()
+        df = substituir_replacement_char(df)
+        return df
     except Exception as e:
         logger.error(f"Erro na query get_dados_top_n_segmento: {e}", exc_info=True)
         st.error("Não foi possível carregar os dados do Top N.")
         return pd.DataFrame()
-    
+
 # Em components/data_loader_bq.py
 
 # Em components/data_loader_bq.py
@@ -311,3 +395,50 @@ def load_geojson_data(path: str) -> dict:
     except Exception as e:
         st.error(f"Erro ao ler o arquivo GeoJSON: {e}")
         return None
+def calcular_correlacoes(df_temporal):
+    correlacoes = {}
+    df_clean = df_temporal.dropna()
+    if len(df_clean) < 3: return correlacoes
+    indicadores = ['taxa_desemprego', 'valor_ipca', 'taxa_selic_meta']
+    for indicador in indicadores:
+        if indicador in df_clean.columns:
+            pearson_corr, pearson_p = pearsonr(df_clean['taxa_inadimplencia_media'], df_clean[indicador])
+            correlacoes[indicador] = {'pearson': {'corr': pearson_corr, 'p_value': pearson_p}}
+    return correlacoes
+
+def interpretar_correlacao(corr_value):
+    abs_corr = abs(corr_value)
+    if abs_corr >= 0.7: return "Forte"
+    elif abs_corr >= 0.5: return "Moderada"
+    elif abs_corr >= 0.3: return "Fraca"
+    else: return "Muito Fraca"
+def calculate_metrics_for_period(df: pd.DataFrame, start_date: datetime, end_date: datetime, main_metric_col: str):
+    """
+    Calcula o valor médio e a mudança percentual para a métrica principal em um dado período.
+    Args:
+        df: DataFrame contendo os dados temporais.
+        start_date: Data de início do período.
+        end_date: Data de fim do período.
+        main_metric_col: Nome da coluna que contém a métrica principal a ser analisada.
+    Returns:
+        Tupla (valor_medio, mudanca_percentual).
+    """
+    df_filtered = df[(df['mes'] >= start_date) & (df['mes'] <= end_date)].copy()
+    if df_filtered.empty:
+        return 0, 0
+
+    avg_value = df_filtered[main_metric_col].mean()
+    
+    if len(df_filtered) >= 2:
+        df_filtered = df_filtered.sort_values(by='mes')
+        first_value = df_filtered[main_metric_col].iloc[0]
+        last_value = df_filtered[main_metric_col].iloc[-1]
+        
+        if first_value != 0:
+            percent_change = ((last_value - first_value) / first_value) * 100
+        else:
+            percent_change = 0
+    else:
+        percent_change = 0
+    
+    return avg_value, percent_change

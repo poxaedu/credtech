@@ -1,19 +1,13 @@
 [theme]
 base="light"
-backgroundColor="white"
-secondaryBackgroundColor="smoothgreen"
-codeBackgroundColor="powderBlue"
-primaryColor="#425c05ff"
+backgroundColor="#ffffff"
+secondaryBackgroundColor="#cdddd0ff"
+primaryColor="#adde2f"
 
 [theme.sidebar]
-# Primary accent color.
-primaryColor = "#4c6355"
-# Background color of the app.
-backgroundColor = "#87ac83ff"
-# Background color used for most interactive widgets.
-secondaryBackgroundColor = "#5a8854fa"
 
-[theme.fonts]
-heading = "Poppins"
-body = "Poppins"
+# Background color of the app.
+backgroundColor = "#032313"
+# Background color used for most interactive widgets.
+secondaryBackgroundColor = "#adde2f"
 

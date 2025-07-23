@@ -7,7 +7,7 @@ import pandas as pd # Adicionado para manipulação de dados
 # Importe as funções necessárias dos seus módulos
 from components.data_loader import get_bigquery_client, get_dados_visao_geral_uf
 from components.plot_utils import plot_choropleth_brasil, plot_carteira_uf
-from Home import carregar_css # Reutiliza a função de CSS
+from pages.Home import carregar_css # Reutiliza a função de CSS
 
 st.set_page_config(page_title="Visão Geográfica", layout="wide", initial_sidebar_state="expanded")
 carregar_css("style.css")
@@ -24,7 +24,7 @@ def load_geojson_data(path: str) -> dict:
 
 # --- CONTEÚDO DA PÁGINA ---
 
-st.markdown("<div class='dashboard-title'><h2>💡 Visão Geral por UF</h2></div>", unsafe_allow_html=True)
+st.markdown("<div class='dashboard-title'><h1>💡 Visão Geral por UF</h1></div>", unsafe_allow_html=True)
 st.markdown("""<div class='dashboard-subtitle' style='text-align: center;'>
     <h4>Análise geográfica da inadimplência e do volume da carteira de crédito no Brasil.</h4>
 </div>
@@ -40,12 +40,11 @@ try:
 
     # --- NOVO: Destaques com os Top 3 e Bottom 3 Estados ---
     if not df_mapa.empty:
-        st.markdown("<div class='section-header'><h3>Destaques Nacionais de Risco</h3></div>", unsafe_allow_html=True)
         
         # Ordena o DataFrame para encontrar os extremos da inadimplência
         # Ordena por taxa de inadimplência
     # Ordena por taxa de inadimplência (do maior para o menor)
-    df_sorted = df_mapa.sort_values(by='taxa_inadimplencia_media', ascending=False)
+        df_sorted = df_mapa.sort_values(by='taxa_inadimplencia_media', ascending=False)
 
     top3_piores = df_sorted.head(3)
     top3_melhores = df_sorted.tail(3).iloc[::-1]
@@ -60,15 +59,15 @@ try:
             <hr style="width: 80%; margin: 0 auto 1rem auto; border: none; border-top: 1px solid #e2e8f0;">
             <div style="display: flex; justify-content: space-around;">
                 <div style="display: flex; flex-direction: column; align-items: center;">
-                    <h3 class="card-sub-text">1º {top3_piores.iloc[0]['uf']}</h3>
+                    <div class="uf-unit-pill">1º {top3_piores.iloc[0]['uf']}</div>
                     <h2 style="card-metric-value">{top3_piores.iloc[0]['taxa_inadimplencia_media']:.2%}</h2>
                 </div>
                 <div style="display: center; flex-direction: column; align-items: center;">
-                    <h3 class="card-sub-text">2º {top3_piores.iloc[1]['uf']}</h3>
+                    <div class="uf-unit-pill">2º {top3_piores.iloc[1]['uf']}</div>
                     <h2 class="card-metric-value">{top3_piores.iloc[1]['taxa_inadimplencia_media']:.2%}</h2>
                 </div>
                 <div style="display: flex; flex-direction: column; align-items: center;">
-                    <h3 class="card-sub-text">3º {top3_piores.iloc[2]['uf']}</h3>
+                    <div class="uf-unit-pill">3º {top3_piores.iloc[2]['uf']}</div>
                     <h3 class="card-metric-value">{top3_piores.iloc[2]['taxa_inadimplencia_media']:.2%}</h2>
                 </div>
             </div>
